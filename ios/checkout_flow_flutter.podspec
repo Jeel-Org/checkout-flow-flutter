@@ -4,22 +4,24 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'checkout_flow_flutter'
-  s.version          = '0.1.0'
+  s.version          = '0.1.1'
   s.summary          = 'Flutter integration for Checkout Flow Apple Pay payments.'
   s.description      = <<-DESC
-Flutter integration for Checkout Flow Apple Pay payments. Swift Package Manager is required.
+Flutter integration for Checkout Flow Apple Pay payments.
                        DESC
   s.homepage         = 'https://github.com/Jeel-Org/checkout-flow-flutter'
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Jeel' => 'engineering@jeel.co' }
   s.source           = { :path => '.' }
   s.source_files = 'checkout_flow_flutter/Sources/checkout_flow_flutter/**/*'
+  s.vendored_frameworks = 'Frameworks/CheckoutComponentsSDK.xcframework'
   s.dependency 'Flutter'
+  s.dependency 'Risk', '~> 4.0.1'
   s.platform = :ios, '15.0'
 
   # Flutter.framework does not contain a i386 slice.
-  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
-  s.swift_version = '6.0'
+  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
+  s.swift_version = '5.0'
 
   # If your plugin requires a privacy manifest, for example if it uses any
   # required reason APIs, update the PrivacyInfo.xcprivacy file to describe your

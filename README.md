@@ -9,7 +9,7 @@ polling remain the responsibility of the integrating application and backend.
 
 ## Requirements
 
-- Flutter 3.44 or newer with Swift Package Manager enabled
+- Flutter 3.44 or newer
 - iOS 15 or newer
 - An arm64 device or simulator (required by Checkout's iOS binary)
 - A Checkout.com public key and payment session
@@ -62,6 +62,10 @@ switch (result.status) {
 Enable the Apple Pay capability for the iOS application target and select the
 same merchant identifier passed to `payWithApplePay`. The plugin deliberately
 does not modify application entitlements or contain merchant-specific values.
+
+The plugin supports both CocoaPods and Swift Package Manager. Existing Flutter
+applications can keep their current native dependency manager; no manual
+Checkout SDK or platform-channel setup is required in the host application.
 
 Do not embed Checkout.com secret keys in a Flutter application. Only the public
 key belongs in the client; payment sessions must be created by the backend.
