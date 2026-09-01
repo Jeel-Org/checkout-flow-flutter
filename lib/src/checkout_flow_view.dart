@@ -5,7 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'checkout_flow_models.dart';
 import 'checkout_flow_result_mapper.dart';
 
-/// Renders Checkout.com's complete Flow component on iOS.
+/// Renders Checkout.com's complete Flow component on iOS and Android.
 class CheckoutFlowView extends StatefulWidget {
   const CheckoutFlowView({
     super.key,
@@ -27,21 +27,38 @@ class _CheckoutFlowViewState extends State<CheckoutFlowView> {
 
   @override
   Widget build(BuildContext context) {
-    if (kIsWeb || defaultTargetPlatform != TargetPlatform.iOS) {
-      throw UnsupportedError('CheckoutFlowView currently supports iOS only.');
+    if (kIsWeb) {
+      throw UnsupportedError('CheckoutFlowView does not support web.');
     }
 
     _validateConfiguration(widget.configuration);
-
-    return UiKitView(
-      viewType: 'checkout_flow_flutter/flow',
-      creationParams: _creationParams(widget.configuration),
-      creationParamsCodec: const StandardMessageCodec(),
-      onPlatformViewCreated: _onPlatformViewCreated,
+    final platformViewKey = ValueKey<int>(
+      _configurationHash(widget.configuration),
     );
+
+    return switch (defaultTargetPlatform) {
+      TargetPlatform.iOS => UiKitView(
+        key: platformViewKey,
+        viewType: 'checkout_flow_flutter/flow',
+        creationParams: _creationParams(widget.configuration),
+        creationParamsCodec: const StandardMessageCodec(),
+        onPlatformViewCreated: _onPlatformViewCreated,
+      ),
+      TargetPlatform.android => AndroidView(
+        key: platformViewKey,
+        viewType: 'checkout_flow_flutter/flow',
+        creationParams: _creationParams(widget.configuration),
+        creationParamsCodec: const StandardMessageCodec(),
+        onPlatformViewCreated: _onPlatformViewCreated,
+      ),
+      _ => throw UnsupportedError(
+        'CheckoutFlowView supports iOS and Android only.',
+      ),
+    };
   }
 
   void _onPlatformViewCreated(int viewId) {
+    _channel?.setMethodCallHandler(null);
     final channel = MethodChannel('checkout_flow_flutter/flow/$viewId');
     channel.setMethodCallHandler(_handleMethodCall);
     _channel = channel;
@@ -69,6 +86,16 @@ class _CheckoutFlowViewState extends State<CheckoutFlowView> {
   }
 }
 
+int _configurationHash(CheckoutFlowConfiguration configuration) => Object.hash(
+  configuration.paymentSession.id,
+  configuration.paymentSession.secret,
+  configuration.publicKey,
+  configuration.environment,
+  configuration.applePayMerchantIdentifier,
+  configuration.googlePayEnabled,
+  configuration.locale,
+);
+
 Map<String, Object?> _creationParams(CheckoutFlowConfiguration configuration) {
   return <String, Object?>{
     'paymentSessionId': configuration.paymentSession.id,
@@ -76,6 +103,7 @@ Map<String, Object?> _creationParams(CheckoutFlowConfiguration configuration) {
     'publicKey': configuration.publicKey,
     'environment': configuration.environment.name,
     'merchantIdentifier': ?configuration.applePayMerchantIdentifier,
+    'googlePayEnabled': configuration.googlePayEnabled,
     'locale': ?configuration.locale,
   };
 }

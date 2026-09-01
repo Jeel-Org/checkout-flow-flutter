@@ -11,9 +11,9 @@ screen.
 
 | Capability | Status | Flutter API direction |
 | --- | --- | --- |
-| Full Checkout Flow | Next | `CheckoutFlowView` widget |
+| Full Checkout Flow | Available on iOS and Android | `CheckoutFlowView` widget |
 | Direct Apple Pay | Available on iOS | `payWithApplePay()` |
-| Direct Google Pay | Planned with Android support | `payWithGooglePay()` |
+| Direct Google Pay | Available on Android | `payWithGooglePay()` |
 | Standalone card form | Future | `CheckoutCardView` widget |
 | Stored cards | Future | Dedicated component |
 | Other payment methods | Future | Optional components and configuration |
@@ -31,13 +31,11 @@ The package should:
   payment session, and wallet configuration; and
 - include examples and tests for every supported payment experience.
 
-## Delivery order
+## Delivery direction
 
-1. Keep direct Apple Pay stable on iOS.
-2. Add the complete Checkout Flow interface on iOS.
-3. Add Android Flow and direct Google Pay.
-4. Grow into standalone and optional components based on real integration
-   needs.
+Direct Apple Pay, complete Checkout Flow, Android Flow, and direct Google Pay
+form the package's initial cross-platform foundation. Future releases can grow
+into standalone and optional components based on real integration needs.
 
 The roadmap describes direction rather than a promise that every native
 Checkout component will be exposed. Features will be added when they can have a

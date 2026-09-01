@@ -34,4 +34,41 @@ class MethodChannelCheckoutFlowFlutter extends CheckoutFlowFlutterPlatform {
 
     return checkoutFlowResultFromMap(response);
   }
+
+  @override
+  Future<bool> isGooglePayAvailable({
+    required CheckoutFlowPaymentSession paymentSession,
+    required String publicKey,
+    required CheckoutFlowEnvironment environment,
+  }) async {
+    final available = await methodChannel.invokeMethod<bool>(
+      'isGooglePayAvailable',
+      _googlePayArguments(paymentSession, publicKey, environment),
+    );
+    return available ?? false;
+  }
+
+  @override
+  Future<CheckoutFlowPaymentResult> payWithGooglePay({
+    required CheckoutFlowPaymentSession paymentSession,
+    required String publicKey,
+    required CheckoutFlowEnvironment environment,
+  }) async {
+    final response = await methodChannel.invokeMapMethod<Object?, Object?>(
+      'payWithGooglePay',
+      _googlePayArguments(paymentSession, publicKey, environment),
+    );
+    return checkoutFlowResultFromMap(response);
+  }
 }
+
+Map<String, Object?> _googlePayArguments(
+  CheckoutFlowPaymentSession paymentSession,
+  String publicKey,
+  CheckoutFlowEnvironment environment,
+) => <String, Object?>{
+  'paymentSessionId': paymentSession.id,
+  'paymentSessionSecret': paymentSession.secret,
+  'publicKey': publicKey,
+  'environment': environment.name,
+};

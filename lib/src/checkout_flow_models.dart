@@ -19,6 +19,7 @@ final class CheckoutFlowConfiguration {
     required this.publicKey,
     this.environment = CheckoutFlowEnvironment.sandbox,
     this.applePayMerchantIdentifier,
+    this.googlePayEnabled = false,
     this.locale,
   });
 
@@ -28,6 +29,12 @@ final class CheckoutFlowConfiguration {
 
   /// Adds Apple Pay to Flow when provided and available for the session.
   final String? applePayMerchantIdentifier;
+
+  /// Adds Google Pay to Flow on Android when enabled.
+  ///
+  /// The host activity must extend `FlutterFragmentActivity` because the
+  /// native Google Pay coordinator uses Android's Activity Result API.
+  final bool googlePayEnabled;
 
   /// Optional locale such as `en-GB` or `ar-SA`.
   final String? locale;

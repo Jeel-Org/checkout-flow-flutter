@@ -1,4 +1,5 @@
 import 'package:checkout_flow_flutter/checkout_flow_flutter.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 const _publicKey = String.fromEnvironment('CHECKOUT_PUBLIC_KEY');
@@ -64,6 +65,30 @@ class _CheckoutExamplePageState extends State<CheckoutExamplePage> {
     setState(() => _status = 'Apple Pay: ${result.status.name}');
   }
 
+  Future<void> _checkGooglePay() async {
+    if (!_hasPaymentSession) return;
+
+    final available = await _checkoutFlow.isGooglePayAvailable(
+      paymentSession: _paymentSession,
+      publicKey: _publicKey,
+    );
+    if (!mounted) return;
+    setState(
+      () => _status = available ? 'Google Pay available' : 'Unavailable',
+    );
+  }
+
+  Future<void> _payWithGooglePay() async {
+    if (!_hasPaymentSession) return;
+
+    final result = await _checkoutFlow.payWithGooglePay(
+      paymentSession: _paymentSession,
+      publicKey: _publicKey,
+    );
+    if (!mounted) return;
+    setState(() => _status = 'Google Pay: ${result.status.name}');
+  }
+
   void _showFullFlow() {
     if (!_hasPaymentSession) return;
 
@@ -76,6 +101,7 @@ class _CheckoutExamplePageState extends State<CheckoutExamplePage> {
             applePayMerchantIdentifier: _merchantIdentifier.isEmpty
                 ? null
                 : _merchantIdentifier,
+            googlePayEnabled: defaultTargetPlatform == TargetPlatform.android,
           ),
         ),
       ),
@@ -94,22 +120,37 @@ class _CheckoutExamplePageState extends State<CheckoutExamplePage> {
           children: [
             Text(_status, textAlign: TextAlign.center),
             const SizedBox(height: 24),
-            OutlinedButton(
-              onPressed: _checkApplePay,
-              child: const Text('Check Apple Pay availability'),
-            ),
-            const SizedBox(height: 12),
+            if (defaultTargetPlatform == TargetPlatform.iOS) ...[
+              OutlinedButton(
+                onPressed: _checkApplePay,
+                child: const Text('Check Apple Pay availability'),
+              ),
+              const SizedBox(height: 12),
+            ],
+            if (defaultTargetPlatform == TargetPlatform.android) ...[
+              OutlinedButton(
+                onPressed: _hasPaymentSession ? _checkGooglePay : null,
+                child: const Text('Check Google Pay availability'),
+              ),
+              const SizedBox(height: 12),
+            ],
             FilledButton(
               onPressed: _hasPaymentSession ? _showFullFlow : null,
               child: const Text('Show full Checkout Flow'),
             ),
             const SizedBox(height: 12),
-            FilledButton(
-              onPressed: _hasPaymentSession && _merchantIdentifier.isNotEmpty
-                  ? _payWithApplePay
-                  : null,
-              child: const Text('Pay directly with Apple Pay'),
-            ),
+            if (defaultTargetPlatform == TargetPlatform.iOS)
+              FilledButton(
+                onPressed: _hasPaymentSession && _merchantIdentifier.isNotEmpty
+                    ? _payWithApplePay
+                    : null,
+                child: const Text('Pay directly with Apple Pay'),
+              ),
+            if (defaultTargetPlatform == TargetPlatform.android)
+              FilledButton(
+                onPressed: _hasPaymentSession ? _payWithGooglePay : null,
+                child: const Text('Pay directly with Google Pay'),
+              ),
             if (!_hasPaymentSession) ...[
               const SizedBox(height: 24),
               const Text(
