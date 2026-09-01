@@ -12,15 +12,40 @@ final class CheckoutFlowPaymentSession {
   final String secret;
 }
 
-/// Result of an Apple Pay attempt.
+/// Configuration shared by the full Checkout Flow component.
+final class CheckoutFlowConfiguration {
+  const CheckoutFlowConfiguration({
+    required this.paymentSession,
+    required this.publicKey,
+    this.environment = CheckoutFlowEnvironment.sandbox,
+    this.applePayMerchantIdentifier,
+    this.locale,
+  });
+
+  final CheckoutFlowPaymentSession paymentSession;
+  final String publicKey;
+  final CheckoutFlowEnvironment environment;
+
+  /// Adds Apple Pay to Flow when provided and available for the session.
+  final String? applePayMerchantIdentifier;
+
+  /// Optional locale such as `en-GB` or `ar-SA`.
+  final String? locale;
+}
+
+/// Result reported after a Flow or direct wallet payment attempt.
 final class CheckoutFlowPaymentResult {
   const CheckoutFlowPaymentResult({
     required this.status,
+    this.paymentId,
+    this.componentName,
     this.errorCode,
     this.errorMessage,
   });
 
   final CheckoutFlowPaymentStatus status;
+  final String? paymentId;
+  final String? componentName;
   final String? errorCode;
   final String? errorMessage;
 

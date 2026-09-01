@@ -13,6 +13,13 @@ public final class CheckoutFlowFlutterPlugin: NSObject, FlutterPlugin {
     )
     let instance = CheckoutFlowFlutterPlugin()
     registrar.addMethodCallDelegate(instance, channel: channel)
+    registrar.register(
+      CheckoutFlowViewFactory(
+        messenger: registrar.messenger(),
+        viewController: registrar.viewController
+      ),
+      withId: "checkout_flow_flutter/flow"
+    )
   }
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -84,9 +91,13 @@ public final class CheckoutFlowFlutterPlugin: NSObject, FlutterPlugin {
           publicKey: publicKey,
           environment: environment,
           callbacks: .init(
-            onSuccess: { [weak self] _, _ in
+            onSuccess: { [weak self] component, paymentID in
               Task { @MainActor [weak self] in
-                self?.complete(status: "submitted")
+                self?.complete(
+                  status: "submitted",
+                  paymentId: paymentID,
+                  componentName: component.name
+                )
               }
             },
             onError: { [weak self] error in
@@ -143,10 +154,14 @@ public final class CheckoutFlowFlutterPlugin: NSObject, FlutterPlugin {
   @MainActor
   private func complete(
     status: String,
+    paymentId: String? = nil,
+    componentName: String? = nil,
     errorCode: String? = nil,
     errorMessage: String? = nil
   ) {
     var response: [String: Any] = ["status": status]
+    if let paymentId { response["paymentId"] = paymentId }
+    if let componentName { response["componentName"] = componentName }
     if let errorCode { response["errorCode"] = errorCode }
     if let errorMessage { response["errorMessage"] = errorMessage }
 

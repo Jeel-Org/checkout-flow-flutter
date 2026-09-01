@@ -1,17 +1,21 @@
-# checkout_flow_flutter_example
+# Checkout Flow Flutter example
 
-Demonstrates how to use the checkout_flow_flutter plugin.
+The example demonstrates:
 
-## Getting Started
+- the complete Checkout Flow interface;
+- direct Apple Pay; and
+- Apple Pay availability detection.
 
-This project is a starting point for a Flutter application.
+Create a sandbox payment session on your backend, then run the iOS example:
 
-A few resources to get you started if this is your first Flutter project:
+```sh
+flutter run \
+  --dart-define=CHECKOUT_PUBLIC_KEY=pk_sbox_... \
+  --dart-define=PAYMENT_SESSION_ID=ps_... \
+  --dart-define=PAYMENT_SESSION_SECRET=... \
+  --dart-define=APPLE_PAY_MERCHANT_IDENTIFIER=merchant.example
+```
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The public key and merchant identifier are client configuration. The payment
+session must be created by a trusted backend; never add a Checkout secret key to
+the example application.

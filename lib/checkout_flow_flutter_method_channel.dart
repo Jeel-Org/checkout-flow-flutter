@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'checkout_flow_flutter_platform_interface.dart';
+import 'src/checkout_flow_result_mapper.dart';
 import 'src/checkout_flow_models.dart';
 
 /// An implementation of [CheckoutFlowFlutterPlatform] that uses method channels.
@@ -31,16 +32,6 @@ class MethodChannelCheckoutFlowFlutter extends CheckoutFlowFlutterPlatform {
           'environment': environment.name,
         });
 
-    final status = switch (response?['status']) {
-      'submitted' => CheckoutFlowPaymentStatus.submitted,
-      'cancelled' => CheckoutFlowPaymentStatus.cancelled,
-      _ => CheckoutFlowPaymentStatus.failed,
-    };
-
-    return CheckoutFlowPaymentResult(
-      status: status,
-      errorCode: response?['errorCode'] as String?,
-      errorMessage: response?['errorMessage'] as String?,
-    );
+    return checkoutFlowResultFromMap(response);
   }
 }
