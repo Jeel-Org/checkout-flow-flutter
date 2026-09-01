@@ -26,6 +26,9 @@ application-owned direct wallet button, poll payment status, or verify the final
 payment. Those responsibilities remain with the integrating application and
 its backend. The full Flow view renders its own available payment-method UI.
 
+See [ROADMAP.md](ROADMAP.md) for the current capabilities and planned Flutter
+interfaces.
+
 The package exposes a small Dart API while keeping the native Checkout SDKs and
 Flutter platform channels internal. Host applications do not need their own
 Swift/Kotlin bridge or Checkout SDK dependency.
