@@ -1,6 +1,6 @@
 name: checkout_flow_flutter
-description: Flutter integration for Checkout Flow Apple Pay payments.
-version: 0.1.1
+description: Unofficial Flutter integration for Checkout.com Flow and direct wallet payments.
+version: 0.2.0
 homepage: https://github.com/Jeel-Org/checkout-flow-flutter
 repository: https://github.com/Jeel-Org/checkout-flow-flutter
 issue_tracker: https://github.com/Jeel-Org/checkout-flow-flutter/issues

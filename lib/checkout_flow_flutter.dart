@@ -2,8 +2,9 @@ import 'checkout_flow_flutter_platform_interface.dart';
 import 'src/checkout_flow_models.dart';
 
 export 'src/checkout_flow_models.dart';
+export 'src/checkout_flow_view.dart';
 
-/// High-level access to Checkout Flow's Apple Pay component.
+/// High-level access to direct Checkout.com wallet payments.
 final class CheckoutFlowFlutter {
   CheckoutFlowFlutter({CheckoutFlowFlutterPlatform? platform})
     : _platform = platform ?? CheckoutFlowFlutterPlatform.instance;

@@ -1,7 +1,7 @@
 # Checkout Flow Flutter
 
-An unofficial Flutter plugin for presenting Checkout.com Flow Apple Pay from an
-existing Checkout.com payment session.
+An unofficial Flutter plugin for presenting the complete Checkout.com Flow
+experience or opening Apple Pay directly from an existing payment session.
 
 > [!IMPORTANT]
 > This package is maintained by Jeel and is not an official Checkout.com
@@ -12,16 +12,17 @@ existing Checkout.com payment session.
 
 ## Scope
 
-This package is specifically for:
+This package currently provides on iOS:
 
-- Checkout.com as the payment provider
-- Apple Pay through Checkout Flow
-- Flutter applications running on iOS
+- `CheckoutFlowView` for full Flow with card and optional Apple Pay
+- `payWithApplePay()` for applications with their own payment-method UI
 
-It currently does not provide Android, web, card-entry, Google Pay, or other
-payment-provider integrations. It also does not create payment sessions,
-render an Apple Pay button, poll payment status, or verify the final payment.
-Those responsibilities remain with the integrating application and its backend.
+It does not yet provide Android, web, direct Google Pay, standalone card-entry,
+or other payment-provider integrations. It also does not create payment
+sessions, provide the application-owned button for direct Apple Pay, poll
+payment status, or verify the final payment. Those responsibilities remain with
+the integrating application and its backend. The full Flow view renders its own
+available payment-method UI.
 
 The package exposes a small Dart API while keeping the Checkout iOS SDK and
 Flutter platform-channel implementation internal. Host applications do not need
@@ -32,10 +33,10 @@ to add their own Swift bridge or Checkout SDK integration.
 1. Your backend creates a Checkout.com payment session using its secret key.
 2. The backend returns the payment session ID and payment session secret to the
    Flutter application.
-3. The Flutter application calls `payWithApplePay` with that session, its
-   Checkout.com public key, environment, and Apple Pay merchant identifier.
-4. Checkout Flow presents Apple Pay and submits the wallet payment to
-   Checkout.com.
+3. The Flutter application renders `CheckoutFlowView` or calls
+   `payWithApplePay` with that session and its Checkout client configuration.
+4. Checkout Flow presents the chosen payment experience and submits the payment
+   to Checkout.com.
 5. A `submitted` result means the SDK submitted the payment. Your application
    must verify or poll the final payment status through its backend.
 
@@ -66,7 +67,7 @@ dependencies:
   checkout_flow_flutter:
     git:
       url: https://github.com/Jeel-Org/checkout-flow-flutter.git
-      ref: v0.1.1
+      ref: v0.2.0
 ```
 
 Then install dependencies:
@@ -114,6 +115,36 @@ import 'package:checkout_flow_flutter/checkout_flow_flutter.dart';
 
 final checkoutFlow = CheckoutFlowFlutter();
 ```
+
+### Full Checkout Flow
+
+Render the complete Flow interface inside a constrained area such as an
+`Expanded` or `SizedBox` widget:
+
+```dart
+CheckoutFlowView(
+  configuration: CheckoutFlowConfiguration(
+    paymentSession: CheckoutFlowPaymentSession(
+      id: paymentSessionId,
+      secret: paymentSessionSecret,
+    ),
+    publicKey: checkoutPublicKey,
+    environment: CheckoutFlowEnvironment.sandbox,
+    applePayMerchantIdentifier: applePayMerchantIdentifier,
+    locale: 'en-GB',
+  ),
+  onReady: () {
+    // Flow is ready for customer input.
+  },
+  onPaymentResult: (result) {
+    // Verify submitted payments through your backend.
+  },
+)
+```
+
+Omit `applePayMerchantIdentifier` to render Flow with card only.
+
+### Direct Apple Pay
 
 Check whether Apple Pay can be presented before displaying it as an available
 payment method:
@@ -166,6 +197,12 @@ backend payment status as the source of truth.
 ### `isApplePayAvailable()`
 
 Returns whether Apple Pay can be presented on the current iOS device.
+
+### `CheckoutFlowView`
+
+Renders the complete Checkout Flow interface with card and optional Apple Pay.
+The host widget must provide bounded width and height. It reports readiness and
+payment results through callbacks.
 
 ### `payWithApplePay(...)`
 

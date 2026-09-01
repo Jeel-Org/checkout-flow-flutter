@@ -71,4 +71,21 @@ void main() {
       throwsArgumentError,
     );
   });
+
+  test('creates configuration for full Flow', () {
+    const configuration = CheckoutFlowConfiguration(
+      paymentSession: CheckoutFlowPaymentSession(
+        id: 'ps_test',
+        secret: 'secret',
+      ),
+      publicKey: 'pk_sbox_test',
+      applePayMerchantIdentifier: 'merchant.example',
+      locale: 'en-GB',
+    );
+
+    expect(configuration.environment, CheckoutFlowEnvironment.sandbox);
+    expect(configuration.paymentSession.id, 'ps_test');
+    expect(configuration.applePayMerchantIdentifier, 'merchant.example');
+    expect(configuration.locale, 'en-GB');
+  });
 }

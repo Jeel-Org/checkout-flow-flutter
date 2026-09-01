@@ -4,10 +4,10 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'checkout_flow_flutter'
-  s.version          = '0.1.1'
-  s.summary          = 'Flutter integration for Checkout Flow Apple Pay payments.'
+  s.version          = '0.2.0'
+  s.summary          = 'Flutter integration for Checkout.com Flow and direct wallet payments.'
   s.description      = <<-DESC
-Flutter integration for Checkout Flow Apple Pay payments.
+Flutter integration for Checkout.com Flow and direct wallet payments.
                        DESC
   s.homepage         = 'https://github.com/Jeel-Org/checkout-flow-flutter'
   s.license          = { :file => '../LICENSE' }

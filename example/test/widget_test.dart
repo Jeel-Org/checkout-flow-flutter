@@ -11,9 +11,10 @@ import 'package:checkout_flow_flutter_example/main.dart';
 
 void main() {
   testWidgets('shows Apple Pay availability action', (tester) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(const ExampleApp());
 
-    expect(find.text('Apple Pay: Not checked'), findsOneWidget);
-    expect(find.text('Check availability'), findsOneWidget);
+    expect(find.text('Ready'), findsOneWidget);
+    expect(find.text('Check Apple Pay availability'), findsOneWidget);
+    expect(find.text('Show full Checkout Flow'), findsOneWidget);
   });
 }

@@ -38,6 +38,8 @@ void main() {
           });
           return {
             'status': 'failed',
+            'paymentId': 'pay_test',
+            'componentName': 'applePay',
             'errorCode': 'declined',
             'errorMessage': 'Payment declined',
           };
@@ -54,6 +56,8 @@ void main() {
     );
 
     expect(result.status, CheckoutFlowPaymentStatus.failed);
+    expect(result.paymentId, 'pay_test');
+    expect(result.componentName, 'applePay');
     expect(result.errorCode, 'declined');
     expect(result.errorMessage, 'Payment declined');
   });
