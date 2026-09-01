@@ -1,32 +1,34 @@
 # Checkout Flow Flutter
 
 An unofficial Flutter plugin for presenting the complete Checkout.com Flow
-experience or opening Apple Pay directly from an existing payment session.
+experience or opening Apple Pay and Google Pay directly from an existing
+payment session.
 
 > [!IMPORTANT]
 > This package is maintained by Jeel and is not an official Checkout.com
 > package. It is not affiliated with, endorsed by, or supported by Checkout.com.
 > For the official native SDK and documentation, see
-> [Flow for Mobile iOS SDK](https://github.com/checkout/checkout-ios-components)
+> [Flow for Mobile iOS SDK](https://github.com/checkout/checkout-ios-components),
+> [Flow for Mobile Android SDK](https://github.com/checkout/checkout-android-components),
 > and the [Checkout.com documentation](https://www.checkout.com/docs/).
 
 ## Scope
 
-This package currently provides on iOS:
+This package currently provides:
 
-- `CheckoutFlowView` for full Flow with card and optional Apple Pay
-- `payWithApplePay()` for applications with their own payment-method UI
+- `CheckoutFlowView` for full Flow on iOS and Android
+- `payWithApplePay()` for an application-owned Apple Pay button on iOS
+- `payWithGooglePay()` for an application-owned Google Pay button on Android
 
-It does not yet provide Android, web, direct Google Pay, standalone card-entry,
-or other payment-provider integrations. It also does not create payment
-sessions, provide the application-owned button for direct Apple Pay, poll
-payment status, or verify the final payment. Those responsibilities remain with
-the integrating application and its backend. The full Flow view renders its own
-available payment-method UI.
+It does not provide web, standalone card-entry, or other payment-provider
+integrations. It also does not create payment sessions, draw the
+application-owned direct wallet button, poll payment status, or verify the final
+payment. Those responsibilities remain with the integrating application and
+its backend. The full Flow view renders its own available payment-method UI.
 
-The package exposes a small Dart API while keeping the Checkout iOS SDK and
-Flutter platform-channel implementation internal. Host applications do not need
-to add their own Swift bridge or Checkout SDK integration.
+The package exposes a small Dart API while keeping the native Checkout SDKs and
+Flutter platform channels internal. Host applications do not need their own
+Swift/Kotlin bridge or Checkout SDK dependency.
 
 ## How it works
 
@@ -34,28 +36,30 @@ to add their own Swift bridge or Checkout SDK integration.
 2. The backend returns the payment session ID and payment session secret to the
    Flutter application.
 3. The Flutter application renders `CheckoutFlowView` or calls
-   `payWithApplePay` with that session and its Checkout client configuration.
+   a direct wallet payment with that session and its Checkout client
+   configuration.
 4. Checkout Flow presents the chosen payment experience and submits the payment
    to Checkout.com.
 5. A `submitted` result means the SDK submitted the payment. Your application
    must verify or poll the final payment status through its backend.
 
-The Apple Pay token is handled by Checkout Flow. It is not returned to the
+Wallet tokens are handled by Checkout Flow. They are not returned to the
 Flutter application and should not be forwarded manually to the backend.
 
 ## Requirements
 
 - Flutter 3.44 or newer
-- Dart 3.11 or newer
-- iOS 15 or newer
-- Xcode 16 or newer
-- An arm64 device or simulator
+- Dart 3.12 or newer
+- iOS 15 or newer and Xcode 16 or newer for iOS
+- An arm64 device or simulator for iOS
+- Android API 24 or newer for Android
 - A Checkout.com account and public key
 - A payment session created by your backend
-- An Apple Pay merchant identifier configured for the host application
+- An Apple Pay merchant identifier for Apple Pay
+- A Google Pay-enabled Checkout.com processing channel for Google Pay
 
-The current package release integrates Checkout's iOS Components SDK 2.6.0 and
-Checkout Risk SDK 4.0.1.
+The current package release integrates Checkout's iOS and Android Components
+SDKs 2.6.0 and Checkout Risk SDK 4.0.1 on iOS.
 
 ## Installation
 
@@ -67,7 +71,7 @@ dependencies:
   checkout_flow_flutter:
     git:
       url: https://github.com/Jeel-Org/checkout-flow-flutter.git
-      ref: v0.2.0
+      ref: v0.3.0
 ```
 
 Then install dependencies:
@@ -92,6 +96,22 @@ In Xcode, open the host application's target and:
 The identifier enabled in the application entitlement must be the same value
 passed to `payWithApplePay`.
 
+## Android configuration
+
+Google Pay's Activity Result integration requires the host activity to extend
+`FlutterFragmentActivity`. Many Flutter applications already use it for other
+plugins. If yours does not, change only the activity base class:
+
+```kotlin
+import io.flutter.embedding.android.FlutterFragmentActivity
+
+class MainActivity : FlutterFragmentActivity()
+```
+
+No Checkout SDK dependency, method channel, manifest entry, or Google Pay
+coordinator is required in the host application. Full Flow without Google Pay
+can run with the standard `FlutterActivity`.
+
 ## Backend requirements
 
 Create the Checkout.com payment session on a trusted backend. Never include a
@@ -102,9 +122,9 @@ The Flutter application needs these values from the backend session response:
 - Payment session ID
 - Payment session secret
 
-The Checkout.com public key (`pk_...`) and Apple Pay merchant identifier are
-client configuration values and may be stored using the application's normal
-environment-configuration mechanism.
+The Checkout.com public key (`pk_...`), Apple Pay merchant identifier, and
+wallet enablement are client configuration values and may be stored using the
+application's normal environment-configuration mechanism.
 
 ## Usage
 
@@ -131,6 +151,7 @@ CheckoutFlowView(
     publicKey: checkoutPublicKey,
     environment: CheckoutFlowEnvironment.sandbox,
     applePayMerchantIdentifier: applePayMerchantIdentifier,
+    googlePayEnabled: true,
     locale: 'en-GB',
   ),
   onReady: () {
@@ -142,7 +163,10 @@ CheckoutFlowView(
 )
 ```
 
-Omit `applePayMerchantIdentifier` to render Flow with card only.
+On iOS, provide `applePayMerchantIdentifier` to include Apple Pay. On Android,
+set `googlePayEnabled` to `true` when the backend payment session includes
+Google Pay. The backend payment session remains the source of truth for the
+payment methods available to Flow.
 
 ### Direct Apple Pay
 
@@ -192,17 +216,50 @@ switch (result.status) {
 `submitted` is not a replacement for server-side verification. Treat the
 backend payment status as the source of truth.
 
+### Direct Google Pay
+
+Direct Google Pay uses an existing payment session and opens the native wallet
+from your own Flutter payment button:
+
+```dart
+final isAvailable = await checkoutFlow.isGooglePayAvailable(
+  paymentSession: CheckoutFlowPaymentSession(
+    id: paymentSessionId,
+    secret: paymentSessionSecret,
+  ),
+  publicKey: checkoutPublicKey,
+  environment: CheckoutFlowEnvironment.sandbox,
+);
+
+if (isAvailable) {
+  final result = await checkoutFlow.payWithGooglePay(
+    paymentSession: CheckoutFlowPaymentSession(
+      id: paymentSessionId,
+      secret: paymentSessionSecret,
+    ),
+    publicKey: checkoutPublicKey,
+    environment: CheckoutFlowEnvironment.sandbox,
+  );
+  // Verify submitted payments through your backend.
+}
+```
+
 ## API
 
 ### `isApplePayAvailable()`
 
 Returns whether Apple Pay can be presented on the current iOS device.
 
+### `isGooglePayAvailable(...)`
+
+Returns whether direct Google Pay is available for the supplied Android payment
+session.
+
 ### `CheckoutFlowView`
 
-Renders the complete Checkout Flow interface with card and optional Apple Pay.
-The host widget must provide bounded width and height. It reports readiness and
-payment results through callbacks.
+Renders the complete Checkout Flow interface on iOS and Android. The host widget
+must provide bounded width and height. It reports readiness and payment results
+through callbacks.
 
 ### `payWithApplePay(...)`
 
@@ -217,6 +274,12 @@ Required arguments:
 Returns a `CheckoutFlowPaymentResult` with a `submitted`, `cancelled`, or
 `failed` status and optional error details.
 
+### `payWithGooglePay(...)`
+
+Presents Checkout Flow's Google Pay component from the application's own button
+using an existing payment session. It returns the same structured payment
+result as direct Apple Pay.
+
 ## Troubleshooting
 
 If Apple Pay is unavailable or the sheet does not open, verify that:
@@ -227,6 +290,16 @@ If Apple Pay is unavailable or the sheet does not open, verify that:
 - the public key, payment session, and selected environment all belong to the
   same Checkout.com environment; and
 - the payment session is present and has not expired.
+
+If Google Pay is unavailable or does not open, verify that:
+
+- the application is running on Android API 24 or newer with Google Play
+  services;
+- `MainActivity` extends `FlutterFragmentActivity`;
+- Google Pay is enabled for the Checkout.com processing channel and payment
+  session; and
+- the public key, payment session, and environment belong to the same Checkout
+  environment.
 
 ## Support
 

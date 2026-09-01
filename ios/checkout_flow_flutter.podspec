@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'checkout_flow_flutter'
-  s.version          = '0.2.0'
+  s.version          = '0.3.0'
   s.summary          = 'Flutter integration for Checkout.com Flow and direct wallet payments.'
   s.description      = <<-DESC
 Flutter integration for Checkout.com Flow and direct wallet payments.

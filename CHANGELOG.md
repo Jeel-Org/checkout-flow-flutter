@@ -1,3 +1,11 @@
+## 0.3.0
+
+* Add Android support for `CheckoutFlowView`.
+* Add direct Google Pay availability and payment APIs.
+* Keep Android Checkout SDK setup and payment coordination inside the plugin.
+* Add an Android example and cross-platform usage documentation.
+* Migrate the Android plugin to Flutter's built-in Kotlin-compatible setup.
+
 ## 0.2.0
 
 * Add `CheckoutFlowView` for the complete Checkout Flow experience on iOS.

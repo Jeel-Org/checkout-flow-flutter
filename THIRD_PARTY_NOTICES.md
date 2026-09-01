@@ -5,6 +5,11 @@ Checkout.com. The upstream project is available at:
 
 https://github.com/checkout/checkout-ios-components
 
+The Android implementation depends on Checkout.com's Android Components SDK
+2.6.0 from Maven Central. Its upstream project and license are available at:
+
+https://github.com/checkout/checkout-android-components
+
 ## CheckoutComponentsSDK license
 
 MIT License

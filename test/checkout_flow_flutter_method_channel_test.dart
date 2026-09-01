@@ -61,4 +61,54 @@ void main() {
     expect(result.errorCode, 'declined');
     expect(result.errorMessage, 'Payment declined');
   });
+
+  test('isGooglePayAvailable maps session arguments', () async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (methodCall) async {
+          expect(methodCall.method, 'isGooglePayAvailable');
+          expect(methodCall.arguments, {
+            'paymentSessionId': 'ps_test',
+            'paymentSessionSecret': 'secret',
+            'publicKey': 'pk_sbox_test',
+            'environment': 'sandbox',
+          });
+          return true;
+        });
+
+    final available = await platform.isGooglePayAvailable(
+      paymentSession: const CheckoutFlowPaymentSession(
+        id: 'ps_test',
+        secret: 'secret',
+      ),
+      publicKey: 'pk_sbox_test',
+      environment: CheckoutFlowEnvironment.sandbox,
+    );
+
+    expect(available, isTrue);
+  });
+
+  test('payWithGooglePay maps payment result', () async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (methodCall) async {
+          expect(methodCall.method, 'payWithGooglePay');
+          return {
+            'status': 'submitted',
+            'paymentId': 'pay_test',
+            'componentName': 'googlepay',
+          };
+        });
+
+    final result = await platform.payWithGooglePay(
+      paymentSession: const CheckoutFlowPaymentSession(
+        id: 'ps_test',
+        secret: 'secret',
+      ),
+      publicKey: 'pk_sbox_test',
+      environment: CheckoutFlowEnvironment.sandbox,
+    );
+
+    expect(result.status, CheckoutFlowPaymentStatus.submitted);
+    expect(result.paymentId, 'pay_test');
+    expect(result.componentName, 'googlepay');
+  });
 }
