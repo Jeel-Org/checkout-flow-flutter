@@ -18,6 +18,9 @@ This package is specifically for:
 - Apple Pay through Checkout Flow
 - Flutter applications running on iOS
 
+See [ROADMAP.md](ROADMAP.md) for the current capabilities and planned Flutter
+interfaces.
+
 It currently does not provide Android, web, card-entry, Google Pay, or other
 payment-provider integrations. It also does not create payment sessions,
 render an Apple Pay button, poll payment status, or verify the final payment.
