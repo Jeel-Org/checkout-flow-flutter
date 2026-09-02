@@ -27,14 +27,14 @@ application-owned direct wallet button, poll payment status, or verify the final
 payment. Those responsibilities remain with the integrating application and
 its backend. The full Flow view renders its own available payment-method UI.
 
-See [ROADMAP.md](ROADMAP.md) for the current capabilities and planned Flutter
-interfaces.
-
 The package exposes a small Dart API while keeping the native Checkout SDKs and
 Flutter platform channels internal. Host applications do not need their own
 Swift/Kotlin bridge or Checkout SDK dependency.
 
-## How it works
+## Backend and payment flow
+
+Create payment sessions on a trusted backend. Never include a Checkout.com
+secret key (`sk_...`) in a Flutter application.
 
 1. Your backend creates a Checkout.com payment session using its secret key.
 2. The backend returns the payment session ID and payment session secret to the
@@ -49,6 +49,10 @@ Swift/Kotlin bridge or Checkout SDK dependency.
 
 Wallet tokens are handled by Checkout Flow. They are not returned to the
 Flutter application and should not be forwarded manually to the backend.
+
+The Flutter application needs the payment session ID and payment session secret
+from the backend response. The Checkout.com public key (`pk_...`), Apple Pay
+merchant identifier, and wallet enablement are client configuration values.
 
 ## Requirements
 
@@ -67,7 +71,6 @@ Flutter application and should not be forwarded manually to the backend.
 | Platform | Dependency | Version | Purpose |
 | --- | --- | --- | --- |
 | Android | Checkout Android Components | `2.6.0` | Full Flow, managed card entry, and Google Pay |
-| Android | Kotlin coroutines for Android | `1.10.2` | Asynchronous native SDK coordination |
 | iOS | Checkout iOS Components | `2.6.0` | Full Flow, managed card entry, and Apple Pay |
 | iOS | Checkout Risk SDK | `4.0.1` | Checkout device-risk signals |
 
@@ -124,20 +127,6 @@ class MainActivity : FlutterFragmentActivity()
 No Checkout SDK dependency, method channel, manifest entry, or Google Pay
 coordinator is required in the host application. Full Flow without Google Pay
 can run with the standard `FlutterActivity`.
-
-## Backend requirements
-
-Create the Checkout.com payment session on a trusted backend. Never include a
-Checkout.com secret key (`sk_...`) in a Flutter application.
-
-The Flutter application needs these values from the backend session response:
-
-- Payment session ID
-- Payment session secret
-
-The Checkout.com public key (`pk_...`), Apple Pay merchant identifier, and
-wallet enablement are client configuration values and may be stored using the
-application's normal environment-configuration mechanism.
 
 ## Usage
 
@@ -256,63 +245,6 @@ if (isAvailable) {
   // Verify submitted payments through your backend.
 }
 ```
-
-## API
-
-### `isApplePayAvailable()`
-
-Returns whether Apple Pay can be presented on the current iOS device.
-
-### `isGooglePayAvailable(...)`
-
-Returns whether direct Google Pay is available for the supplied Android payment
-session.
-
-### `CheckoutFlowView`
-
-Renders the complete Checkout Flow interface on iOS and Android. The host widget
-must provide bounded width and height. It reports readiness and payment results
-through callbacks.
-
-### `payWithApplePay(...)`
-
-Presents Checkout Flow's Apple Pay component using an existing payment session.
-Required arguments:
-
-- `paymentSession`: Checkout.com session ID and secret returned by the backend
-- `publicKey`: Checkout.com sandbox or production public key
-- `merchantIdentifier`: Apple Pay merchant identifier from the app entitlement
-- `environment`: `sandbox` by default, or `production`
-
-Returns a `CheckoutFlowPaymentResult` with a `submitted`, `cancelled`, or
-`failed` status and optional error details.
-
-### `payWithGooglePay(...)`
-
-Presents Checkout Flow's Google Pay component from the application's own button
-using an existing payment session. It returns the same structured payment
-result as direct Apple Pay.
-
-## Troubleshooting
-
-If Apple Pay is unavailable or the sheet does not open, verify that:
-
-- the application is running on iOS 15 or newer on an arm64 device or simulator;
-- Apple Pay is enabled for the application target;
-- the merchant identifier matches the application entitlement;
-- the public key, payment session, and selected environment all belong to the
-  same Checkout.com environment; and
-- the payment session is present and has not expired.
-
-If Google Pay is unavailable or does not open, verify that:
-
-- the application is running on Android API 24 or newer with Google Play
-  services;
-- `MainActivity` extends `FlutterFragmentActivity`;
-- Google Pay is enabled for the Checkout.com processing channel and payment
-  session; and
-- the public key, payment session, and environment belong to the same Checkout
-  environment.
 
 ## Support
 
