@@ -16,7 +16,8 @@ payment session.
 
 This package currently provides:
 
-- `CheckoutFlowView` for full Flow on iOS and Android
+- `CheckoutFlowView` for full Flow on iOS and Android, including Checkout's
+  managed card-entry experience when cards are available in the payment session
 - `payWithApplePay()` for an application-owned Apple Pay button on iOS
 - `payWithGooglePay()` for an application-owned Google Pay button on Android
 
@@ -61,8 +62,17 @@ Flutter application and should not be forwarded manually to the backend.
 - An Apple Pay merchant identifier for Apple Pay
 - A Google Pay-enabled Checkout.com processing channel for Google Pay
 
-The current package release integrates Checkout's iOS and Android Components
-SDKs 2.6.0 and Checkout Risk SDK 4.0.1 on iOS.
+### Native dependencies
+
+| Platform | Dependency | Version | Purpose |
+| --- | --- | --- | --- |
+| Android | Checkout Android Components | `2.6.0` | Full Flow, managed card entry, and Google Pay |
+| Android | Kotlin coroutines for Android | `1.10.2` | Asynchronous native SDK coordination |
+| iOS | Checkout iOS Components | `2.6.0` | Full Flow, managed card entry, and Apple Pay |
+| iOS | Checkout Risk SDK | `4.0.1` | Checkout device-risk signals |
+
+Host applications should not add these dependencies themselves. The plugin
+declares them and keeps the native integration internal.
 
 ## Installation
 
@@ -74,7 +84,7 @@ dependencies:
   checkout_flow_flutter:
     git:
       url: https://github.com/Jeel-Org/checkout-flow-flutter.git
-      ref: v0.3.0
+      ref: v0.3.1
 ```
 
 Then install dependencies:
