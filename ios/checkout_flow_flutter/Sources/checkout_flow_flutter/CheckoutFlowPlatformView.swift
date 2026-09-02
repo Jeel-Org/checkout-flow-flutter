@@ -5,11 +5,9 @@ import UIKit
 
 final class CheckoutFlowViewFactory: NSObject, FlutterPlatformViewFactory {
   private let messenger: FlutterBinaryMessenger
-  private weak var viewController: UIViewController?
 
-  init(messenger: FlutterBinaryMessenger, viewController: UIViewController?) {
+  init(messenger: FlutterBinaryMessenger) {
     self.messenger = messenger
-    self.viewController = viewController
     super.init()
   }
 
@@ -26,8 +24,7 @@ final class CheckoutFlowViewFactory: NSObject, FlutterPlatformViewFactory {
       frame: frame,
       viewId: viewId,
       arguments: args,
-      messenger: messenger,
-      viewController: viewController
+      messenger: messenger
     )
   }
 }
@@ -35,7 +32,6 @@ final class CheckoutFlowViewFactory: NSObject, FlutterPlatformViewFactory {
 final class CheckoutFlowPlatformView: NSObject, FlutterPlatformView {
   private let containerView: UIView
   private let channel: FlutterMethodChannel
-  private weak var parentViewController: UIViewController?
   private var hostingController: UIHostingController<AnyView>?
   private var activeComponent: Any?
 
@@ -43,8 +39,7 @@ final class CheckoutFlowPlatformView: NSObject, FlutterPlatformView {
     frame: CGRect,
     viewId: Int64,
     arguments: Any?,
-    messenger: FlutterBinaryMessenger,
-    viewController: UIViewController?
+    messenger: FlutterBinaryMessenger
   ) {
     containerView = UIView(frame: frame)
     containerView.backgroundColor = .clear
@@ -52,7 +47,6 @@ final class CheckoutFlowPlatformView: NSObject, FlutterPlatformView {
       name: "checkout_flow_flutter/flow/\(viewId)",
       binaryMessenger: messenger
     )
-    parentViewController = viewController
     super.init()
 
     Task { @MainActor [weak self] in
@@ -178,6 +172,7 @@ final class CheckoutFlowPlatformView: NSObject, FlutterPlatformView {
     hostingController.view.backgroundColor = .clear
     hostingController.view.translatesAutoresizingMaskIntoConstraints = false
 
+    let parentViewController = containerView.enclosingViewController
     if let parentViewController {
       parentViewController.addChild(hostingController)
     }
@@ -236,5 +231,18 @@ final class CheckoutFlowPlatformView: NSObject, FlutterPlatformView {
       hostingController?.view.removeFromSuperview()
       hostingController?.removeFromParent()
     }
+  }
+}
+
+private extension UIView {
+  var enclosingViewController: UIViewController? {
+    var responder: UIResponder? = self
+    while let current = responder {
+      if let viewController = current as? UIViewController {
+        return viewController
+      }
+      responder = current.next
+    }
+    return nil
   }
 }
