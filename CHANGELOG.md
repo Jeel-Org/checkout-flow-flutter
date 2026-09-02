@@ -1,3 +1,9 @@
+## 0.3.1
+
+* Enable Swift Package Manager in the example application.
+* Package the privacy manifest consistently with Swift Package Manager and CocoaPods.
+* Resolve the host view controller from the platform view hierarchy for both package managers.
+
 ## 0.3.0
 
 * Add Android support for `CheckoutFlowView`.

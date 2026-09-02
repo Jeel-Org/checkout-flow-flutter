@@ -15,8 +15,7 @@ public final class CheckoutFlowFlutterPlugin: NSObject, FlutterPlugin {
     registrar.addMethodCallDelegate(instance, channel: channel)
     registrar.register(
       CheckoutFlowViewFactory(
-        messenger: registrar.messenger(),
-        viewController: registrar.viewController
+        messenger: registrar.messenger()
       ),
       withId: "checkout_flow_flutter/flow"
     )

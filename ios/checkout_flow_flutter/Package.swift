@@ -27,7 +27,7 @@ let package = Package(
                 .product(name: "Risk", package: "checkout-risk-sdk-ios"),
                 .target(name: "CheckoutComponentsSDK")
             ],
-            resources: [.process("PrivacyInfo.xcprivacy")]
+            resources: [.process("Resources/PrivacyInfo.xcprivacy")]
         ),
         .binaryTarget(
             name: "CheckoutComponentsSDK",
