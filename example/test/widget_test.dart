@@ -10,12 +10,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:checkout_flow_flutter_example/main.dart';
 
 void main() {
-  testWidgets('shows Android payment actions', (tester) async {
+  testWidgets('shows iOS payment actions', (tester) async {
     await tester.pumpWidget(const ExampleApp());
 
     expect(find.text('Ready'), findsOneWidget);
-    expect(find.text('Check Google Pay availability'), findsOneWidget);
-    expect(find.text('Pay directly with Google Pay'), findsOneWidget);
+    expect(find.text('Check Apple Pay availability'), findsOneWidget);
+    expect(find.text('Pay directly with Apple Pay'), findsOneWidget);
     expect(find.text('Show full Checkout Flow'), findsOneWidget);
   });
 }

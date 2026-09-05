@@ -19,22 +19,6 @@ class MockCheckoutFlowFlutterPlatform
   }) async => const CheckoutFlowPaymentResult(
     status: CheckoutFlowPaymentStatus.submitted,
   );
-
-  @override
-  Future<bool> isGooglePayAvailable({
-    required CheckoutFlowPaymentSession paymentSession,
-    required String publicKey,
-    required CheckoutFlowEnvironment environment,
-  }) async => true;
-
-  @override
-  Future<CheckoutFlowPaymentResult> payWithGooglePay({
-    required CheckoutFlowPaymentSession paymentSession,
-    required String publicKey,
-    required CheckoutFlowEnvironment environment,
-  }) async => const CheckoutFlowPaymentResult(
-    status: CheckoutFlowPaymentStatus.submitted,
-  );
 }
 
 void main() {
@@ -70,38 +54,6 @@ void main() {
     expect(result.isSubmitted, isTrue);
   });
 
-  test('reports Google Pay availability for a payment session', () async {
-    final plugin = CheckoutFlowFlutter(
-      platform: MockCheckoutFlowFlutterPlatform(),
-    );
-
-    final available = await plugin.isGooglePayAvailable(
-      paymentSession: const CheckoutFlowPaymentSession(
-        id: 'ps_test',
-        secret: 'secret',
-      ),
-      publicKey: 'pk_sbox_test',
-    );
-
-    expect(available, isTrue);
-  });
-
-  test('returns submitted Google Pay result', () async {
-    final plugin = CheckoutFlowFlutter(
-      platform: MockCheckoutFlowFlutterPlatform(),
-    );
-
-    final result = await plugin.payWithGooglePay(
-      paymentSession: const CheckoutFlowPaymentSession(
-        id: 'ps_test',
-        secret: 'secret',
-      ),
-      publicKey: 'pk_sbox_test',
-    );
-
-    expect(result.isSubmitted, isTrue);
-  });
-
   test('rejects empty configuration before calling the platform', () {
     final plugin = CheckoutFlowFlutter(
       platform: MockCheckoutFlowFlutterPlatform(),
@@ -128,14 +80,12 @@ void main() {
       ),
       publicKey: 'pk_sbox_test',
       applePayMerchantIdentifier: 'merchant.example',
-      googlePayEnabled: true,
       locale: 'en-GB',
     );
 
     expect(configuration.environment, CheckoutFlowEnvironment.sandbox);
     expect(configuration.paymentSession.id, 'ps_test');
     expect(configuration.applePayMerchantIdentifier, 'merchant.example');
-    expect(configuration.googlePayEnabled, isTrue);
     expect(configuration.locale, 'en-GB');
   });
 }

@@ -5,7 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'checkout_flow_models.dart';
 import 'checkout_flow_result_mapper.dart';
 
-/// Renders Checkout.com's complete Flow component on iOS and Android.
+/// Renders Checkout.com's complete Flow component on iOS.
 class CheckoutFlowView extends StatefulWidget {
   const CheckoutFlowView({
     super.key,
@@ -44,16 +44,7 @@ class _CheckoutFlowViewState extends State<CheckoutFlowView> {
         creationParamsCodec: const StandardMessageCodec(),
         onPlatformViewCreated: _onPlatformViewCreated,
       ),
-      TargetPlatform.android => AndroidView(
-        key: platformViewKey,
-        viewType: 'checkout_flow_flutter/flow',
-        creationParams: _creationParams(widget.configuration),
-        creationParamsCodec: const StandardMessageCodec(),
-        onPlatformViewCreated: _onPlatformViewCreated,
-      ),
-      _ => throw UnsupportedError(
-        'CheckoutFlowView supports iOS and Android only.',
-      ),
+      _ => throw UnsupportedError('CheckoutFlowView supports iOS only.'),
     };
   }
 
@@ -92,7 +83,6 @@ int _configurationHash(CheckoutFlowConfiguration configuration) => Object.hash(
   configuration.publicKey,
   configuration.environment,
   configuration.applePayMerchantIdentifier,
-  configuration.googlePayEnabled,
   configuration.locale,
 );
 
@@ -103,7 +93,6 @@ Map<String, Object?> _creationParams(CheckoutFlowConfiguration configuration) {
     'publicKey': configuration.publicKey,
     'environment': configuration.environment.name,
     'merchantIdentifier': ?configuration.applePayMerchantIdentifier,
-    'googlePayEnabled': configuration.googlePayEnabled,
     'locale': ?configuration.locale,
   };
 }

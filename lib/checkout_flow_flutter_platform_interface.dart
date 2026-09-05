@@ -33,22 +33,4 @@ abstract class CheckoutFlowFlutterPlatform extends PlatformInterface {
   }) {
     throw UnimplementedError('payWithApplePay() has not been implemented.');
   }
-
-  Future<bool> isGooglePayAvailable({
-    required CheckoutFlowPaymentSession paymentSession,
-    required String publicKey,
-    required CheckoutFlowEnvironment environment,
-  }) {
-    throw UnimplementedError(
-      'isGooglePayAvailable() has not been implemented.',
-    );
-  }
-
-  Future<CheckoutFlowPaymentResult> payWithGooglePay({
-    required CheckoutFlowPaymentSession paymentSession,
-    required String publicKey,
-    required CheckoutFlowEnvironment environment,
-  }) {
-    throw UnimplementedError('payWithGooglePay() has not been implemented.');
-  }
 }

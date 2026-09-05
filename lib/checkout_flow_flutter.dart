@@ -4,7 +4,7 @@ import 'src/checkout_flow_models.dart';
 export 'src/checkout_flow_models.dart';
 export 'src/checkout_flow_view.dart';
 
-/// High-level access to direct Checkout.com wallet payments.
+/// High-level access to direct Checkout.com Apple Pay payments on iOS.
 final class CheckoutFlowFlutter {
   CheckoutFlowFlutter({CheckoutFlowFlutterPlatform? platform})
     : _platform = platform ?? CheckoutFlowFlutterPlatform.instance;
@@ -32,43 +32,6 @@ final class CheckoutFlowFlutter {
       merchantIdentifier: merchantIdentifier,
       environment: environment,
     );
-  }
-
-  /// Whether direct Google Pay is available for this Android payment session.
-  Future<bool> isGooglePayAvailable({
-    required CheckoutFlowPaymentSession paymentSession,
-    required String publicKey,
-    CheckoutFlowEnvironment environment = CheckoutFlowEnvironment.sandbox,
-  }) {
-    _validateWalletConfiguration(paymentSession, publicKey);
-    return _platform.isGooglePayAvailable(
-      paymentSession: paymentSession,
-      publicKey: publicKey,
-      environment: environment,
-    );
-  }
-
-  /// Opens Google Pay from the application's own payment button on Android.
-  Future<CheckoutFlowPaymentResult> payWithGooglePay({
-    required CheckoutFlowPaymentSession paymentSession,
-    required String publicKey,
-    CheckoutFlowEnvironment environment = CheckoutFlowEnvironment.sandbox,
-  }) {
-    _validateWalletConfiguration(paymentSession, publicKey);
-    return _platform.payWithGooglePay(
-      paymentSession: paymentSession,
-      publicKey: publicKey,
-      environment: environment,
-    );
-  }
-
-  static void _validateWalletConfiguration(
-    CheckoutFlowPaymentSession paymentSession,
-    String publicKey,
-  ) {
-    _requireNotBlank(paymentSession.id, 'paymentSession.id');
-    _requireNotBlank(paymentSession.secret, 'paymentSession.secret');
-    _requireNotBlank(publicKey, 'publicKey');
   }
 
   static void _requireNotBlank(String value, String name) {

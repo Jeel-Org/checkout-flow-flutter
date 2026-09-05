@@ -1,3 +1,9 @@
+## 0.3.1+ios.1
+
+* Provide an iOS-only package variant based on `v0.3.1`.
+* Remove the Android plugin and Checkout Android Components dependency.
+* Remove Google Pay APIs while keeping Checkout Flow and Apple Pay on iOS.
+
 ## 0.3.1
 
 * Enable Swift Package Manager in the example application.
